@@ -1,0 +1,64 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Broker Sync</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h2>Broker Sync Dashboard</h2>
+  <div class="actions">
+    <button onclick="setToken()">Set Token</button>
+    <button onclick="sync()">Sync Trades</button>
+  </div>
+  <h3>Trades</h3>
+  <table id="tradesTable">
+    <thead><tr><th>Symbol</th><th>Quantity</th><th>Price</th><th>Timestamp</th></tr></thead>
+    <tbody></tbody>
+  </table>
+  <h3>Add Trade</h3>
+  <div class="form">
+    <input id="symbol" placeholder="Symbol">
+    <input id="quantity" type="number" placeholder="Quantity">
+    <input id="price" type="number" placeholder="Price">
+    <button onclick="addTrade()">Add</button>
+  </div>
+  <script>
+    const API = "http://localhost:3000";
+    const userId = "u1";
+    const broker = "zerodha";
+
+    async function setToken() {
+      await fetch(`${API}/set-token`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId, broker, token: "t1" })
+      });
+      alert("Token Set!");
+    }
+
+    async function sync() {
+      const res = await fetch(`${API}/sync/${userId}/${broker}`);
+      const trades = await res.json();
+      const tbody = document.querySelector("#tradesTable tbody");
+      tbody.innerHTML = trades.map(t =>
+        `<tr><td>${t.symbol}</td><td>${t.quantity}</td><td>${t.price}</td><td>${new Date(t.timestamp).toLocaleString()}</td></tr>`
+      ).join('');
+    }
+
+    async function addTrade() {
+      const symbol = document.getElementById("symbol").value;
+      const quantity = Number(document.getElementById("quantity").value);
+      const price = Number(document.getElementById("price").value);
+
+      await fetch(`${API}/trade`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId, broker, symbol, quantity, price })
+      });
+      alert("Trade Added!");
+      sync();
+    }
+  </script>
+</body>
+</html>
