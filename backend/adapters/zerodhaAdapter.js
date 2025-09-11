@@ -1,32 +1,25 @@
-const kiteConnect = require("kiteconnnect").KiteConnect;
+import { KiteConnect } from "kiteconnect";
 
-const kc = new KiteConnect({ api_key: process.env.ZERODHA_API_KEY});
+const kc = new KiteConnect({ api_key: process.env.ZERODHA_API_KEY as string });
 
-async function generateLoginUrl(){
+/
+export async function generateLoginUrl(): Promise<string> {
   return kc.getLoginURL();
 }
 
-async function setAccessTokemn(requestToken){
-  return kc.getLoginURL();
-}
-
-async function setAccessToken(requestToken){
-  const session = await kc.generateSession(requestToken,process.env.ZERODHA_API_SECRET);
+export async function setAccessToken(requestToken: string): Promise<any> {
+  const session = await kc.generateSession(
+    requestToken,
+    process.env.ZERODHA_API_SECRET as string
+  );
   kc.setAccessToken(session.access_token);
   return session;
 }
 
-async function getProfile(){
-  return await kc.getprofile();
+export async function getProfile(): Promise<any> {
+  return kc.getProfile();
 }
 
-async function placeOrder(params){
-  return await kc.placeOrder("regular",params);
+export async function placeOrder(params: Record<string, any>): Promise<any> {
+  return kc.placeOrder("regular", params);
 }
-
-module.exports = {
-  generateLoginUrl,
-  setAccessToken,
-  getProfile,
-  placeOrder
-};
